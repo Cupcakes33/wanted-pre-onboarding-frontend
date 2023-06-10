@@ -5,8 +5,10 @@ export default function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/signup" element={pages.SIGNUP} />
-        <Route path="/signin" element={pages.SIGNIN} />
+        <Route element={pages.SIGN_LAYOUT}>
+          <Route path="/signup" element={pages.SIGNUP} />
+          <Route path="/signin" element={pages.SIGNIN} />
+        </Route>
         <Route path="/todo" element={pages.TODO} />
       </Routes>
     </BrowserRouter>

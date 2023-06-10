@@ -12,7 +12,7 @@ export default function SignNav() {
   };
 
   return (
-    <nav>
+    <nav className="mb-2">
       <ul className="w-[450px] flex flex-row justify-center gap-3">
         <li>
           <button

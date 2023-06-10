@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import SignNav from "../UI/SignNav";
+import SignNav from "../ele/SignNav";
 
 export default function SignLayout() {
   return (

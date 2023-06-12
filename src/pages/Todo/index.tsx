@@ -10,7 +10,8 @@ import {
 export default function Todo() {
   const [todos, setTodos] = useState<TTodo[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  
+  const [isEdit, setIsEdit] = useState<{ [key: number]: boolean }>({});
+  const [editValue, setEditValue] = useState<{ [key: number]: string }>({});
 
   useEffect(() => {
     (async () => {
@@ -64,9 +65,9 @@ export default function Todo() {
     }
   };
 
-  const handleUpdate = async ({ id, todo, isCompleted }: TTodo) => {
+  const handleUpdate = async ({ id, isCompleted }: TTodo) => {
     const payload = {
-      todo: todo,
+      todo: editValue[id],
       isCompleted: isCompleted,
     };
     try {
@@ -75,6 +76,7 @@ export default function Todo() {
         setTodos((prev) =>
           prev.map((item) => (item.id === id ? res.data : item))
         );
+        setIsEdit((prev) => ({ ...prev, [id]: false }));
       } else {
         alert("Todo 수정에 실패했습니다.");
       }
@@ -94,6 +96,16 @@ export default function Todo() {
     } catch (error) {
       alert("Todo 삭제에 실패했습니다.");
     }
+  };
+
+  const handleUpdateStart = (item: TTodo) => {
+    setIsEdit((prev) => ({ ...prev, [item.id]: true }));
+    setEditValue((prev) => ({ ...prev, [item.id]: item.todo }));
+  };
+
+  const handleCancel = (item: TTodo) => {
+    setIsEdit((prev) => ({ ...prev, [item.id]: false }));
+    setEditValue((prev) => ({ ...prev, [item.id]: item.todo }));
   };
 
   return (
@@ -121,16 +133,29 @@ export default function Todo() {
                 checked={item.isCompleted}
                 onChange={() => handleCompleted(item)}
               />
-              <input value={item.todo} readOnly className="outline-none" />
+              <input
+                value={isEdit[item.id] ? editValue[item.id] : item.todo}
+                readOnly={!isEdit[item.id]}
+                onChange={(e) => {
+                  setEditValue((prev) => ({
+                    ...prev,
+                    [item.id]: e.target.value,
+                  }));
+                }}
+                className="outline-none"
+              />
             </label>
-            <button onClick={() => handleUpdate(item)}>수정</button>
-            <button
-              onClick={() => {
-                handleDelete(item.id);
-              }}
-            >
-              삭제
-            </button>
+            {isEdit[item.id] ? (
+              <>
+                <button onClick={() => handleUpdate(item)}>제출</button>
+                <button onClick={() => handleCancel(item)}>취소</button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => handleUpdateStart(item)}>수정</button>
+                <button onClick={() => handleDelete(item.id)}>삭제</button>
+              </>
+            )}
           </li>
         ))}
       </ul>

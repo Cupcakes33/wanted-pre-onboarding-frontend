@@ -109,56 +109,95 @@ export default function Todo() {
   };
 
   return (
-    <section className="w-1/2 p-2 border rounded-xl h-1/2">
+    <section className="flex flex-col w-1/2 p-2 overflow-hidden border h-1/2 rounded-xl">
       {/* input area */}
       <form
-        className="w-full h-[40px] flex flex-row gap-2"
+        className="w-full h-[40px] flex flex-row gap-2 mb-2"
         onSubmit={handleSubmit}
       >
         <input
           ref={inputRef}
           className="p-3 rounded-lg outline-none basis-4/5 bg-slate-300"
+          data-testid="new-todo-input"
         />
-        <button className="bg-red-100 rounded-lg basis-1/5">Add</button>
+        <button
+          className="bg-red-100 rounded-lg basis-1/5"
+          data-testid="new-todo-add-button"
+        >
+          Add
+        </button>
       </form>
 
       {/* view area */}
-
-      <ul>
-        {todos?.map((item) => (
-          <li key={item.id}>
-            <label>
-              <input
-                type="checkbox"
-                checked={item.isCompleted}
-                onChange={() => handleCompleted(item)}
-              />
-              <input
-                value={isEdit[item.id] ? editValue[item.id] : item.todo}
-                readOnly={!isEdit[item.id]}
-                onChange={(e) => {
-                  setEditValue((prev) => ({
-                    ...prev,
-                    [item.id]: e.target.value,
-                  }));
-                }}
-                className="outline-none"
-              />
-            </label>
-            {isEdit[item.id] ? (
-              <>
-                <button onClick={() => handleUpdate(item)}>제출</button>
-                <button onClick={() => handleCancel(item)}>취소</button>
-              </>
-            ) : (
-              <>
-                <button onClick={() => handleUpdateStart(item)}>수정</button>
-                <button onClick={() => handleDelete(item.id)}>삭제</button>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
+      <div className="overflow-y-auto">
+        <ul className="flex flex-col w-full h-full gap-2">
+          {todos?.map((item) => (
+            <li
+              key={item.id}
+              className="flex flex-row items-center justify-between"
+            >
+              <label className="flex basis-4/5">
+                <input
+                  type="checkbox"
+                  checked={item.isCompleted}
+                  onChange={() => handleCompleted(item)}
+                  className="mr-2"
+                />
+                <input
+                  value={isEdit[item.id] ? editValue[item.id] : item.todo}
+                  readOnly={!isEdit[item.id]}
+                  onChange={(e) => {
+                    setEditValue((prev) => ({
+                      ...prev,
+                      [item.id]: e.target.value,
+                    }));
+                  }}
+                  className={`w-full outline-none ${
+                    isEdit[item.id] ? "border" : ""
+                  }`}
+                />
+              </label>
+              <div>
+                {isEdit[item.id] ? (
+                  <>
+                    <button
+                      className="px-2 py-1 mr-2 bg-red-100 rounded-lg"
+                      onClick={() => handleUpdate(item)}
+                      data-testid="submit-button"
+                    >
+                      제출
+                    </button>
+                    <button
+                      className="px-2 py-1 bg-red-100 rounded-lg"
+                      onClick={() => handleCancel(item)}
+                      data-testid="cancel-button"
+                    >
+                      취소
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className="px-2 py-1 mr-2 bg-red-100 rounded-lg"
+                      onClick={() => handleUpdateStart(item)}
+                      data-testid="modify-button"
+                    >
+                      수정
+                    </button>
+                    <button
+                      className="px-2 py-1 bg-red-100 rounded-lg"
+                      onClick={() => handleDelete(item.id)}
+                      data-testid="delete-button"
+                    >
+                      삭제
+                    </button>
+                  </>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

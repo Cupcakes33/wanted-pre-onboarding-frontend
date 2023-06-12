@@ -1,12 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { Todo as TTodo } from "../../types/todo";
-import { createTodo, getTodos } from "../../service/todo";
+import { Todo as TTodo, TodoId } from "../../types/todo";
+import { createTodo, deleteTodo, getTodos } from "../../service/todo";
 
 export default function Todo() {
   const [todos, setTodos] = useState<TTodo[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    getTodos().then((res) => console.log(res));
+    const fetchTodos = async () => {
+      try {
+        const res = await getTodos();
+        setTodos(res.data);
+      } catch (error) {
+        alert("데이터를 불러오지 못했습니다.");
+      }
+    };
+    fetchTodos();
   }, []);
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
@@ -22,9 +31,32 @@ export default function Todo() {
         isCompleted: false,
       };
       const res = await createTodo(payload);
-      setTodos((prev) => [...prev, res.data]);
-      inputRef.current.value = ""
-    } catch {}
+      if (res.status === 201) {
+        setTodos((prev) => [...prev, res.data]);
+        inputRef.current.value = "";
+      } else {
+        alert("Todo 작성에 실패했습니다.");
+      }
+    } catch (error) {
+      alert("Todo 작성에 실패했습니다.");
+    }
+  };
+
+  const handleCompleted = (id: number) => {
+    console.log(id);
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await deleteTodo(id);
+      if (res.status === 204) {
+        setTodos((prev) => prev.filter((todo) => todo.id !== id));
+      } else {
+        alert("Todo 삭제에 실패했습니다.");
+      }
+    } catch (error) {
+      alert("Todo 삭제에 실패했습니다.");
+    }
   };
   return (
     <section className="w-1/2 p-2 border rounded-xl h-1/2">
@@ -43,14 +75,26 @@ export default function Todo() {
       {/* view area */}
 
       <ul>
-        <li>
-          <label>
-            <input type="checkbox" />
-            <input value="Todo 1" readOnly className="outline-none" />
-          </label>
-          <button>수정</button>
-          <button>삭제</button>
-        </li>
+        {todos?.map((item) => (
+          <li key={item.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={item.isCompleted}
+                onChange={() => handleCompleted(item.id)}
+              />
+              <input value={item.todo} readOnly className="outline-none" />
+            </label>
+            <button>수정</button>
+            <button
+              onClick={() => {
+                handleDelete(item.id);
+              }}
+            >
+              삭제
+            </button>
+          </li>
+        ))}
       </ul>
     </section>
   );

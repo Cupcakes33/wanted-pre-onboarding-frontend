@@ -56,6 +56,7 @@ export default function TodoItem({
               [item.id]: e.target.value,
             }));
           }}
+          data-testid="modify-input"
           className={`w-full outline-none ${isEdit ? "border" : ""}`}
         />
       </label>

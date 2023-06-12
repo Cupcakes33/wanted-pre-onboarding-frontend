@@ -18,6 +18,7 @@ export default function Router() {
             <Route path="/todo" element={pages.TODO} />
           </Route>
         </Route>
+        <Route path="*" element={<Navigate to="/signin" replace />} />
       </Routes>
     </BrowserRouter>
   );

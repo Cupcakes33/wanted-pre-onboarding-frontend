@@ -1,21 +1,26 @@
 import { useEffect, useRef, useState } from "react";
-import { Todo as TTodo, TodoId } from "../../types/todo";
-import { createTodo, deleteTodo, getTodos } from "../../service/todo";
+import { TTodo } from "../../types/todo";
+import {
+  createTodo,
+  deleteTodo,
+  getTodos,
+  updateTodo,
+} from "../../service/todo";
 
 export default function Todo() {
   const [todos, setTodos] = useState<TTodo[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  
 
   useEffect(() => {
-    const fetchTodos = async () => {
+    (async () => {
       try {
         const res = await getTodos();
         setTodos(res.data);
       } catch (error) {
         alert("데이터를 불러오지 못했습니다.");
       }
-    };
-    fetchTodos();
+    })();
   }, []);
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
@@ -24,7 +29,6 @@ export default function Todo() {
     if (!inputValue) {
       return;
     }
-
     try {
       const payload = {
         todo: inputValue,
@@ -41,9 +45,42 @@ export default function Todo() {
       alert("Todo 작성에 실패했습니다.");
     }
   };
+  const handleCompleted = async ({ id, todo, isCompleted }: TTodo) => {
+    const payload = {
+      todo: todo,
+      isCompleted: !isCompleted,
+    };
+    try {
+      const res = await updateTodo(id, payload);
+      if (res.status === 200) {
+        setTodos((prev) =>
+          prev.map((item) => (item.id === id ? res.data : item))
+        );
+      } else {
+        alert("Todo 수정에 실패했습니다.");
+      }
+    } catch {
+      alert("Todo 수정에 실패했습니다.");
+    }
+  };
 
-  const handleCompleted = (id: number) => {
-    console.log(id);
+  const handleUpdate = async ({ id, todo, isCompleted }: TTodo) => {
+    const payload = {
+      todo: todo,
+      isCompleted: isCompleted,
+    };
+    try {
+      const res = await updateTodo(id, payload);
+      if (res.status === 200) {
+        setTodos((prev) =>
+          prev.map((item) => (item.id === id ? res.data : item))
+        );
+      } else {
+        alert("Todo 수정에 실패했습니다.");
+      }
+    } catch {
+      alert("Todo 수정에 실패했습니다.");
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -58,6 +95,7 @@ export default function Todo() {
       alert("Todo 삭제에 실패했습니다.");
     }
   };
+
   return (
     <section className="w-1/2 p-2 border rounded-xl h-1/2">
       {/* input area */}
@@ -81,11 +119,11 @@ export default function Todo() {
               <input
                 type="checkbox"
                 checked={item.isCompleted}
-                onChange={() => handleCompleted(item.id)}
+                onChange={() => handleCompleted(item)}
               />
               <input value={item.todo} readOnly className="outline-none" />
             </label>
-            <button>수정</button>
+            <button onClick={() => handleUpdate(item)}>수정</button>
             <button
               onClick={() => {
                 handleDelete(item.id);

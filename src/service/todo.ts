@@ -1,12 +1,13 @@
-import { Todo, TodoId, TodoPayload } from "../types/todo";
 import instance from "./instance";
 
-export const createTodo = (payload: TodoPayload) =>
+export const createTodo = (payload: { todo: string; isCompleted: boolean }) =>
   instance.post("/todos", payload);
 
 export const getTodos = () => instance.get("/todos");
 
-// export const updateTodo = (id, todo, isCompleted) =>
-//   instance.put(`/todos/${id}`, { email: email, password: password });
+export const updateTodo = (
+  id: number,
+  payload: { todo: string; isCompleted: boolean }
+) => instance.put(`/todos/${id}`, payload);
 
 export const deleteTodo = (id: number) => instance.delete(`/todos/${id}`);

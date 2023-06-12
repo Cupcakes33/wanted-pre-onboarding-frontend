@@ -10,4 +10,17 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
+instance.interceptors.response.use(
+  (res) => {
+    return res;
+  },
+  (error) => {
+    const res = error.response;
+    if (res.status === 401) {
+      tokenManager.removeToken();
+      window.location.reload();
+    } else return Promise.reject(error);
+  }
+);
+
 export default instance;

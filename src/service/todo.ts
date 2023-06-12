@@ -1,9 +1,11 @@
 import instance from "./instance";
 
+export const getTodos = () => instance.get("/todos");
+
 export const createTodo = (payload: { todo: string; isCompleted: boolean }) =>
   instance.post("/todos", payload);
 
-export const getTodos = () => instance.get("/todos");
+
 
 export const updateTodo = (
   id: number,
